@@ -28,10 +28,10 @@ public class ClientDTO {
         this.email = client.getEmail();
         this.accounts = client.getAccounts()
                                 .stream()
-                                .map(account -> new AccountDTO(account))
+                                .map(currentAccount -> new AccountDTO(currentAccount))
                                 .collect(Collectors.toSet());
     }
-    //Getters and setters
+    //Getters
     public long getId() {
         return id;
     }
