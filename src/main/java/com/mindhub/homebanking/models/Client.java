@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -18,8 +19,14 @@ public class Client {
 
     public String email;
 
+    public String loans;//???
+
     @OneToMany(mappedBy="client", fetch=FetchType.EAGER)
     private Set <Account> accounts = new HashSet<>();
+
+    @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
+    private Set<ClientLoan> clientLoans = new HashSet<>();
+
 
     //Constructor
     public Client() {
@@ -54,6 +61,9 @@ public class Client {
         return accounts ;
     }
 
+    public Set<ClientLoan> getClientLoans() {
+        return clientLoans;
+    }
 
     public void setName(String firstNameame) {
         this.firstName = firstName;
@@ -72,5 +82,21 @@ public class Client {
     public void addAccount(Account account) {
         account.setClient(this);
         accounts.add(account);
+    }
+
+        public void addClientLoan(ClientLoan clientLoan) {
+        clientLoan.setClient(this);
+        clientLoans.add(clientLoan);
+    }
+
+    //????
+
+
+    public String getLoans() {
+        return loans;
+    }
+
+    public void setLoans(String loans) {
+        this.loans = loans;
     }
 }

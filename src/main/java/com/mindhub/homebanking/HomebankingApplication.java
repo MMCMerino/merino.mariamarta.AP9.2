@@ -1,20 +1,16 @@
 package com.mindhub.homebanking;
 
 
-import com.mindhub.homebanking.models.Account;
-import com.mindhub.homebanking.models.Client;
-import com.mindhub.homebanking.models.Transaction;
-import com.mindhub.homebanking.models.TransactionType;
-import com.mindhub.homebanking.repositories.AccountRepository;
-import com.mindhub.homebanking.repositories.ClientRepository;
+import com.mindhub.homebanking.models.*;
+import com.mindhub.homebanking.repositories.*;
 
-import com.mindhub.homebanking.repositories.TransactionRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @SpringBootApplication
 public class HomebankingApplication {
@@ -24,7 +20,8 @@ public class HomebankingApplication {
 	}
 
 	@Bean
-	public CommandLineRunner initData(ClientRepository clientRepository, AccountRepository accountRepository, TransactionRepository transactionRepository){
+	public CommandLineRunner initData(ClientRepository clientRepository, AccountRepository accountRepository, TransactionRepository transactionRepository,
+									  LoanRepository loanRepository, ClientLoanRepository clientLoanRepository){
 		return (args) -> {
 			//Creo dos clientes
 			Client client0 = new Client("Melba","Morel","melba@mindhub.com");
@@ -92,9 +89,39 @@ public class HomebankingApplication {
 			account3.addTransaction(transaction7);
 			transactionRepository.save(transaction7);
 
+			//Creo los distintos tipos de prestamos: hipotecario, personal y automotriz
+
+			Loan loan0 = new Loan("Mortgage",500000, List.of(12, 24, 36, 48, 60));
+			loanRepository.save(loan0); // guardo el prestamo hipotecario en el repositorio
+
+			Loan loan1 = new Loan("Personal", 100000, List.of(6,12,24));
+			loanRepository.save(loan1);
+
+			Loan loan2 = new Loan("Car",300000,List.of(6,12,24,36));
+			loanRepository.save(loan2);
 
 
+			//Creo los prestamos para los distintos clientes
+			//Prestamos de Melba
+			ClientLoan clientLoan0 = new ClientLoan(60,400000);
+			client0.addClientLoan(clientLoan0); //le asigno al cliente el prestamos
+			loan0.addClientLoanLoan(clientLoan0); //Le digo que tipo de prestamo es
+			clientLoanRepository.save(clientLoan0);
 
+			ClientLoan clientLoan1 = new ClientLoan(12,50000);
+			client0.addClientLoan(clientLoan1);
+			loan1.addClientLoanLoan(clientLoan1);
+			clientLoanRepository.save(clientLoan1);
+
+			//Prestamos de Maria client1
+
+			ClientLoan clientLoan2 = new ClientLoan(24,100000);
+			client1.addClientLoan(clientLoan2);
+			loan1.addClientLoanLoan(clientLoan2);
+
+			ClientLoan clientLoan3 = new ClientLoan(36,200000);
+			client1.addClientLoan(clientLoan3);
+			loan2.addClientLoanLoan(clientLoan3);
 
 
 		};
