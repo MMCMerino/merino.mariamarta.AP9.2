@@ -118,10 +118,12 @@ public class HomebankingApplication {
 			ClientLoan clientLoan2 = new ClientLoan(24,100000);
 			client1.addClientLoan(clientLoan2);
 			loan1.addClientLoanLoan(clientLoan2);
+			clientLoanRepository.save(clientLoan2);
 
 			ClientLoan clientLoan3 = new ClientLoan(36,200000);
 			client1.addClientLoan(clientLoan3);
 			loan2.addClientLoanLoan(clientLoan3);
+			clientLoanRepository.save(clientLoan3);
 
 
 		};
