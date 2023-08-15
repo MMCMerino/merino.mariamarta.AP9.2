@@ -1,6 +1,4 @@
-const { createApp } = Vue;
-
-createApp({
+Vue.createApp({
     data() {
         return {
             clientInfo: {},
@@ -9,7 +7,7 @@ createApp({
         }
     },
     methods: {
-        getData() {
+        getData: function () {
             axios.get("/api/clients/1")
                 .then((response) => {
                     //get client ifo
@@ -21,12 +19,12 @@ createApp({
                     this.errorToats.show();
                 })
         },
-        formatDate(date) {
+        formatDate: function (date) {
             return new Date(date).toLocaleDateString('en-gb');
         }
     },
-    mounted() {
+    mounted: function () {
         this.errorToats = new bootstrap.Toast(document.getElementById('danger-toast'));
         this.getData();
     }
-}).mount('#app');
+}).mount('#app')

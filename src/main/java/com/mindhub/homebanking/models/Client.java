@@ -19,13 +19,16 @@ public class Client {
 
     public String email;
 
-    public String loans;//???
+    public String loans;
 
     @OneToMany(mappedBy="client", fetch=FetchType.EAGER)
     private Set <Account> accounts = new HashSet<>();
 
     @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
     private Set<ClientLoan> clientLoans = new HashSet<>();
+
+    @OneToMany(mappedBy ="client", fetch = FetchType.EAGER)
+    private Set<Card> cards = new HashSet<>();
 
 
     //Constructor
@@ -65,6 +68,10 @@ public class Client {
         return clientLoans;
     }
 
+    public Set<Card> getCards() {
+        return cards;
+    }
+
     public void setName(String firstNameame) {
         this.firstName = firstName;
     }
@@ -89,7 +96,10 @@ public class Client {
         clientLoans.add(clientLoan);
     }
 
-    //????
+        public void addCard(Card card){
+        card.setClient(this);
+        cards.add(card);
+         }
 
 
     public String getLoans() {
