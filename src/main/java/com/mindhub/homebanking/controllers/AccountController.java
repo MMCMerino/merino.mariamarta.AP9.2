@@ -25,19 +25,18 @@ public class AccountController {
 
     @GetMapping("/accounts")
     public List<AccountDTO> getAccounts(){
-        List<Account> allAccounts = accountRepository.findAll();
-        List<AccountDTO> convertedListAccount = allAccounts
-                                                        .stream()
-                                                        .map(currentAccount -> new AccountDTO(currentAccount))
-                                                        .collect(Collectors.toList());
-        return convertedListAccount;
+
+        return  accountRepository.findAll()
+                .stream()
+                .map(currentAccount -> new AccountDTO(currentAccount))
+                .collect(Collectors.toList());
 
     }
 
     @GetMapping("/accounts/{id}")
     public AccountDTO getAccountById(@PathVariable Long id){
-        Optional<Account> accountOptional =  accountRepository.findById(id);
-        return new AccountDTO(accountOptional.get());
+
+        return new AccountDTO(accountRepository.findById(id).get());
 
     }
 }

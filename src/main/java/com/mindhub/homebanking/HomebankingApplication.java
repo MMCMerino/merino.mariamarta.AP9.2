@@ -4,10 +4,16 @@ package com.mindhub.homebanking;
 import com.mindhub.homebanking.models.*;
 import com.mindhub.homebanking.repositories.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -20,15 +26,20 @@ public class HomebankingApplication {
 		SpringApplication.run(HomebankingApplication.class, args);
 	}
 
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+
 	@Bean
 	public CommandLineRunner initData(ClientRepository clientRepository, AccountRepository accountRepository, TransactionRepository transactionRepository,
 									  LoanRepository loanRepository, ClientLoanRepository clientLoanRepository,
 									  CardRepository cardRepository){
 		return (args) -> {
 			//Creo dos clientes
-			Client client0 = new Client("Melba","Morel","melba@mindhub.com");
+			Client client0 = new Client("Melba","Morel","melba@mindhub.com", passwordEncoder.encode("11111"));
 			clientRepository.save(client0);
-			Client client1 = new Client("Maria","Martinez","mariamartinez@mindhub.com");
+			Client client1 = new Client("Maria","Martinez","mariamartinez@mindhub.com",passwordEncoder.encode("22222"));
 			clientRepository.save(client1);
 
 			//Creo cuentas para los clientes
@@ -147,4 +158,7 @@ public class HomebankingApplication {
 
 		};
 	}
+
+
+
 }
