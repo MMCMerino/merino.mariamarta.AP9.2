@@ -41,15 +41,15 @@ public class AccountController {
 
     }
 
-
+/*
     @GetMapping("/accounts/{id}")
-   /* public AccountDTO getAccountById(@PathVariable Long id){   //public ResponseEntity<Object>
+    public AccountDTO getAccountById(@PathVariable Long id){   //public ResponseEntity<Object>
 
         return new AccountDTO(accountRepository.findById(id).get());
 
     }*/
 
-
+   @GetMapping("/accounts/{id}")
     public ResponseEntity<Object> getAccountById(@PathVariable Long id, Authentication authentication) {
         Account account = accountRepository.findById(id).get();
         Client client = clientRepository.findByEmail(authentication.getName());
@@ -66,6 +66,5 @@ public class AccountController {
 
         }
     }
-
 
 }
