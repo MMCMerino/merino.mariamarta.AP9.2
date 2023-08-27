@@ -59,9 +59,9 @@ public class ClientController {
 
 
 
-        if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
+        if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {
 
-            return new ResponseEntity<>("Missing data", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Missing data", HttpStatus.FORBIDDEN);//Hacer la loqica para marcar todos los errores.
 
         }
 
