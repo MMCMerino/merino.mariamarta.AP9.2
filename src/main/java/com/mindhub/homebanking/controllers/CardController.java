@@ -68,57 +68,43 @@ public class CardController {
                                           Authentication authentication) {
 
         //debo hacer que el cliente logeado se le genere la tarjeta
-        Client client = this.clientRepository.findByEmail(authentication.getName());
+        Client client = clientRepository.findByEmail(authentication.getName());
+        Set<Card> cards = client.getCards();
+        System.out.println(cards);
+        if(!cards.stream()
+                .filter(card -> card.getType().equals(cardType))
+                .filter(card -> card.getColor().equals(cardColor))
+                .collect(Collectors.toSet()).isEmpty())
+                 {
+            return new ResponseEntity<>("You already have the "+cardColor+ " "+ cardType+ "card", HttpStatus.FORBIDDEN);
 
-        //Busco las condiciones para crear la tarjeta
-        if (cardType.equals(CardType.DEBIT)) { //todo VER CREDITO
-            if (client.getCards().size() > 3) {
-                return new ResponseEntity<>("You already have the maximum number of cards of debit", HttpStatus.FORBIDDEN);
-            } else {// crear tarjeta y (todo)ver de que color es
-                if (cardRepository.existsByCardColor(cardColor)) {//pregunto si ya tiene una tarjeta del color solicitado
-                    return new ResponseEntity<>("You already have this colour card", HttpStatus.FORBIDDEN);
-                } else {
-                    Card cardNew = new Card(client.firstName + " " + client.lastName
-                            , cardType, cardColor
-                            , getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999)
-                            , getRandomNumber(0, 999), LocalDate.now(), LocalDate.now().plusYears(5));
-                    client.addCard(cardNew);
-                    cardRepository.save(cardNew);
+        } if(cards.stream()
+                .filter(card -> card.getType().equals(cardType))
+                .filter(card -> card.getColor().equals(cardColor))
+                .collect(Collectors.toSet()).isEmpty()) {
 
+            Card cardNew = new Card(client.firstName + " " + client.lastName
+                                        , cardType, cardColor
+                                         , getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999)
+                , getRandomNumber(0, 999), LocalDate.now(), LocalDate.now().plusYears(5));
+            client.addCard(cardNew);
+            cardRepository.save(cardNew);
 
-                    return new ResponseEntity<>("Congratulations, you have a new card", HttpStatus.CREATED);
-                }
-            }
-        }
+            return new ResponseEntity<>("Congratulations, you have a new "+cardColor+"card", HttpStatus.CREATED);
 
-        if (cardType.equals(CardType.CREDIT)) { //todo VER CREDITO
-            if (client.getCards().size() > 3) {
-                return new ResponseEntity<>("You already have the maximum number of cards of debit", HttpStatus.FORBIDDEN);
-            } else {// crear tarjeta y (todo)ver de que color es
-                if (cardRepository.existsByCardColor(cardColor)) {//pregunto si ya tiene una tarjeta del color solicitado
-                    return new ResponseEntity<>("You already have this colour card", HttpStatus.FORBIDDEN);
-                } else {
-                    Card cardNew = new Card(client.firstName + " " + client.lastName
-                            , cardType, cardColor
-                            , getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999)
-                            , getRandomNumber(0, 999), LocalDate.now(), LocalDate.now().plusYears(5));
-                    client.addCard(cardNew);
-                    cardRepository.save(cardNew);
-
-
-                    return new ResponseEntity<>("Congratulations, you have a new card", HttpStatus.CREATED);
-                }
-            }
-
-        }
-        else{
-             return new ResponseEntity<>("Error to created card", HttpStatus.NOT_ACCEPTABLE);
+        }else{
+            return new ResponseEntity<>("Error to created card", HttpStatus.NOT_ACCEPTABLE);
         }
 
 
-    }
+        }
+
+
     public int getRandomNumber(int min, int max){
         return (int)((Math.random()*(max-min))+min);
 
 }
+
+
+
 }
