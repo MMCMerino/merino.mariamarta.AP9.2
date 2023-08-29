@@ -23,14 +23,14 @@ public class WebAuthorization extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.authorizeRequests()
-               .antMatchers("/web/index.html","/web/css/**","/web/img/**","/web/index.js").permitAll()//
+               .antMatchers("/web/index.html","/web/css/**","/web/img/**","/web/js/**").permitAll()//
                .antMatchers(HttpMethod.POST, "/api/login","/api/logout","/api/clients").permitAll()
-                .antMatchers(HttpMethod.POST,"/api/clients/current/accounts").hasAnyAuthority("CLIENT","ADMIN")
-              //verlo .antMatchers("/web/**.html").hasAnyAuthority("CLIENT","ADMIN")
+                .antMatchers(HttpMethod.POST,"/api/clients/current/accounts","/api/clients/current/cards").hasAnyAuthority("CLIENT","ADMIN")
+               .antMatchers("/web/**.html").hasAnyAuthority("CLIENT","ADMIN")
                .antMatchers("/api/accounts","/api/cards").hasAnyAuthority("CLIENT","ADMIN")
-               .antMatchers("/api/clients/current","/api/clients/current/cards").hasAnyAuthority("CLIENT","ADMIN");
+               .antMatchers("/api/clients/current","/api/clients/current/cards").hasAnyAuthority("CLIENT","ADMIN")
 
-             //  .anyRequest().denyAll();
+              .anyRequest().denyAll();
 
 
 
