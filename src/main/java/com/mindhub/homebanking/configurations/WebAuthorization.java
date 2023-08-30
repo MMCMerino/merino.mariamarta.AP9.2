@@ -25,10 +25,13 @@ public class WebAuthorization extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                .antMatchers("/web/index.html","/web/css/**","/web/img/**","/web/js/**").permitAll()//
                .antMatchers(HttpMethod.POST, "/api/login","/api/logout","/api/clients").permitAll()
-                .antMatchers(HttpMethod.POST,"/api/clients/current/accounts","/api/clients/current/cards").hasAnyAuthority("CLIENT","ADMIN")
+                .antMatchers(HttpMethod.POST,"/api/clients/current/accounts","/api/clients/current/cards","api/transactions").hasAnyAuthority("CLIENT","ADMIN")
                .antMatchers("/web/**.html").hasAnyAuthority("CLIENT","ADMIN")
-               .antMatchers("/api/accounts","/api/cards").hasAnyAuthority("CLIENT","ADMIN")
-               .antMatchers("/api/clients/current","/api/clients/current/cards").hasAnyAuthority("CLIENT","ADMIN")
+                .antMatchers("/api/**").hasAnyAuthority("CLIENT","ADMIN")
+               //.antMatchers("/api/clients","/api/accounts","/api/cards","api/transactions"
+                //       ,"api/clients/{id}","/api/accounts/{id}","/api/transaction/{id}",
+                //       "/api/clients/current","/api/clients/current/accounts","/api/clients/current/cards").hasAnyAuthority("CLIENT","ADMIN")
+
 
               .anyRequest().denyAll();
 

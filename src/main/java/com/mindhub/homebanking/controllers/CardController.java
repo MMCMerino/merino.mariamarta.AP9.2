@@ -70,7 +70,7 @@ public class CardController {
         //debo hacer que el cliente logeado se le genere la tarjeta
         Client client = clientRepository.findByEmail(authentication.getName());
         Set<Card> cards = client.getCards();
-        System.out.println(cards);
+
         if(!cards.stream()
                 .filter(card -> card.getType().equals(cardType))
                 .filter(card -> card.getColor().equals(cardColor))
