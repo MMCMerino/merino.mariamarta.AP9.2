@@ -19,7 +19,7 @@ public class Account {
     private Long id;
 
     public String number;
-    public double balance;
+    private double balance;
     public LocalDate creationDate;
 
 

@@ -69,6 +69,7 @@ public class TransactionController {
         //debo hacer que el cliente logeado pueda generar la transaccion
         Client client = clientRepository.findByEmail(authentication.getName());
         Set<Account> accounts = client.getAccounts();
+
         Account account1 = accountRepository.findByNumber(fromAccountNumber);
         Account account2 = accountRepository.findByNumber(toAccountNumber);
 
@@ -80,7 +81,13 @@ public class TransactionController {
         }else if (client == null) {
             return new ResponseEntity<>("Client not logged in",HttpStatus.FORBIDDEN);
 
-        }else if(account1.balance < amount){
+        }else if(!(client.getAccounts().contains(account1))){
+
+            return new ResponseEntity<>("The account is not yours",HttpStatus.FORBIDDEN);
+        }else if (amount<=0) {
+            return new ResponseEntity<>("Amount not allowed",HttpStatus.FORBIDDEN);
+        }
+        else if(account1.getBalance() < amount){
             return new ResponseEntity<>("Amount not available",HttpStatus.FORBIDDEN);
         }else if(account1 == account2){
             return new ResponseEntity<>("The source account is the same as the destination account",HttpStatus.FORBIDDEN);
@@ -91,10 +98,12 @@ public class TransactionController {
             Transaction destinationTransaction = new Transaction(TransactionType.CREDIT,amount,description,LocalDate.now());
             account1.addTransaction(sourceTransaction);
             account2.addTransaction(destinationTransaction);
-            account1.balance-=amount; // Preguntar si se puede hacer asi.
-            account2.balance+=amount;
+            account1.setBalance(account1.getBalance()-amount);
+            account2.setBalance(account2.getBalance()+amount);
             transactionRepository.save(sourceTransaction);
             transactionRepository.save(destinationTransaction);
+            accountRepository.save(account1);
+            accountRepository.save(account2);
 
 
 
