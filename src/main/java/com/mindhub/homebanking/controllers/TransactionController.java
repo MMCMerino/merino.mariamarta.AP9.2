@@ -6,6 +6,9 @@ import com.mindhub.homebanking.models.*;
 import com.mindhub.homebanking.repositories.AccountRepository;
 import com.mindhub.homebanking.repositories.ClientRepository;
 import com.mindhub.homebanking.repositories.TransactionRepository;
+import com.mindhub.homebanking.services.AccountService;
+import com.mindhub.homebanking.services.ClientService;
+import com.mindhub.homebanking.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,25 +26,20 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class TransactionController {
     @Autowired
-    private TransactionRepository transactionRepository;
-
+    private TransactionService transactionService;
     @Autowired
-    private ClientRepository clientRepository;
-
+    private ClientService clientService;
     @Autowired
-    private AccountRepository accountRepository;
-
+    private AccountService accountService;
     @GetMapping("/transactions")
     public List<TransactionDTO> getTransactions(){
-        return transactionRepository.findAll()
-                .stream().map( currentTransaction -> new TransactionDTO(currentTransaction))
-                .collect(Collectors.toList());
+        return transactionService.getTransaction();
     }
 
     @GetMapping("/transactions/{id}")
     public ResponseEntity<Object> getTransactionById(@PathVariable Long id, Authentication authentication){
-        Transaction transaction = transactionRepository.findById(id).get();
-        Client client = clientRepository.findByEmail(authentication.getName());
+        Transaction transaction = transactionService.findById(id);
+        Client client = clientService.findByEmail(authentication.getName());
 
         if (client == null) {
             return new ResponseEntity<>("Client not found", HttpStatus.BAD_GATEWAY);
@@ -67,43 +65,43 @@ public class TransactionController {
                                           Authentication authentication) {
 
         //debo hacer que el cliente logeado pueda generar la transaccion
-        Client client = clientRepository.findByEmail(authentication.getName());
+        Client client = clientService.findByEmail(authentication.getName());
         Set<Account> accounts = client.getAccounts();
 
-        Account account1 = accountRepository.findByNumber(fromAccountNumber);
-        Account account2 = accountRepository.findByNumber(toAccountNumber);
+        Account fromAccount = accountService.findByNumber(fromAccountNumber);
+        Account toAccount = accountService.findByNumber(toAccountNumber);
 
         if(fromAccountNumber.isBlank()
                 || toAccountNumber.isBlank()|| description.isBlank()){
             return new ResponseEntity<>("Missing Data",HttpStatus.FORBIDDEN);
-        } else if (account1== null || account2 == null) {
+        } else if (fromAccount== null || toAccount == null) {
             return new ResponseEntity<>("The account does not exist", HttpStatus.FORBIDDEN);
         }else if (client == null) {
             return new ResponseEntity<>("Client not logged in",HttpStatus.FORBIDDEN);
 
-        }else if(!(client.getAccounts().contains(account1))){
+        }else if(!(client.getAccounts().contains(fromAccount))){
 
             return new ResponseEntity<>("The account is not yours",HttpStatus.FORBIDDEN);
         }else if (amount<=0) {
             return new ResponseEntity<>("Amount not allowed",HttpStatus.FORBIDDEN);
         }
-        else if(account1.getBalance() < amount){
+        else if(fromAccount.getBalance() < amount){
             return new ResponseEntity<>("Amount not available",HttpStatus.FORBIDDEN);
-        }else if(account1 == account2){
+        }else if(fromAccount == toAccount){
             return new ResponseEntity<>("The source account is the same as the destination account",HttpStatus.FORBIDDEN);
         }else{
-            //todo generar la transaccion
+            //generar la transaccion
 
             Transaction sourceTransaction = new Transaction(TransactionType.DEBIT,-amount, description,LocalDate.now());
             Transaction destinationTransaction = new Transaction(TransactionType.CREDIT,amount,description,LocalDate.now());
-            account1.addTransaction(sourceTransaction);
-            account2.addTransaction(destinationTransaction);
-            account1.setBalance(account1.getBalance()-amount);
-            account2.setBalance(account2.getBalance()+amount);
-            transactionRepository.save(sourceTransaction);
-            transactionRepository.save(destinationTransaction);
-            accountRepository.save(account1);
-            accountRepository.save(account2);
+            fromAccount.addTransaction(sourceTransaction);
+            toAccount.addTransaction(destinationTransaction);
+            fromAccount.setBalance(fromAccount.getBalance()-amount);
+            toAccount.setBalance(toAccount.getBalance()+amount);
+            transactionService.save(sourceTransaction);
+            transactionService.save(destinationTransaction);
+            accountService.save(fromAccount);
+            accountService.save(toAccount);
 
 
 

@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 public class AccountDTO {
 
     private Long id;
-    public String number;
-    public double balance;
-    public LocalDate creationDate;
+    private String number;
+    private double balance;
+    private LocalDate creationDate;
     private Set<TransactionDTO> transactions = new HashSet<>();
 
 

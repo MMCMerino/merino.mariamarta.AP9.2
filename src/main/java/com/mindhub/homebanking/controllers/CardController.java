@@ -5,6 +5,8 @@ import com.mindhub.homebanking.dtos.CardDTO;
 import com.mindhub.homebanking.models.*;
 import com.mindhub.homebanking.repositories.CardRepository;
 import com.mindhub.homebanking.repositories.ClientRepository;
+import com.mindhub.homebanking.services.CardService;
+import com.mindhub.homebanking.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,25 +22,22 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class CardController {
 
-    @Autowired
-    private CardRepository cardRepository;
 
     @Autowired
-    private ClientRepository clientRepository;
+    private CardService cardService;
+    @Autowired
+    private ClientService clientService;
 
     @GetMapping("/cards")
     public List<CardDTO> getCards() {
 
-        return cardRepository.findAll()
-                .stream()
-                .map(currentCard -> new CardDTO(currentCard))
-                .collect(Collectors.toList());
+        return cardService.getCards();
     }
 
     @GetMapping("/cards/{id}")
     public ResponseEntity<Object> getCardById(@PathVariable Long id, Authentication authentication) {
-        Card card = cardRepository.findById(id).get();
-        Client client = clientRepository.findByEmail(authentication.getName());
+        Card card = cardService.findById(id);
+        Client client = clientService.findByEmail(authentication.getName());
 
         if (client == null) {
             return new ResponseEntity<>("Client not found", HttpStatus.BAD_GATEWAY);
@@ -55,7 +54,7 @@ public class CardController {
 
     @GetMapping("/clients/current/cards")
     public Set<CardDTO> getCards(Authentication authentication) {
-        Client client = this.clientRepository.findByEmail(authentication.getName());
+        Client client = this.clientService.findByEmail(authentication.getName());
         return client.getCards().stream()
                 .map(currentCard -> new CardDTO(currentCard))
                 .collect(Collectors.toSet());
@@ -68,7 +67,7 @@ public class CardController {
                                           Authentication authentication) {
 
         //debo hacer que el cliente logeado se le genere la tarjeta
-        Client client = clientRepository.findByEmail(authentication.getName());
+        Client client = clientService.findByEmail(authentication.getName());
         Set<Card> cards = client.getCards();
 
         if(!cards.stream()
@@ -78,23 +77,19 @@ public class CardController {
                  {
             return new ResponseEntity<>("You already have the "+cardColor+ " "+ cardType+ "card", HttpStatus.FORBIDDEN);
 
-        } if(cards.stream()
-                .filter(card -> card.getType().equals(cardType))
-                .filter(card -> card.getColor().equals(cardColor))
-                .collect(Collectors.toSet()).isEmpty()) {
+        } else{
 
-            Card cardNew = new Card(client.firstName + " " + client.lastName
+            Card cardNew = new Card(client.getFirstName() + " " + client.getLastName()
                                         , cardType, cardColor
                                          , getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999)
                 , getRandomNumber(0, 999), LocalDate.now(), LocalDate.now().plusYears(5));
             client.addCard(cardNew);
-            cardRepository.save(cardNew);
+            cardService.save(cardNew);
 
             return new ResponseEntity<>("Congratulations, you have a new "+cardColor+"card", HttpStatus.CREATED);
 
-        }else{
-            return new ResponseEntity<>("Error to created card", HttpStatus.NOT_ACCEPTABLE);
         }
+
 
 
         }

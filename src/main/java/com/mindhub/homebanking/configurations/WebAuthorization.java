@@ -23,10 +23,12 @@ public class WebAuthorization extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.authorizeRequests()
-               .antMatchers("/web/index.html","/web/css/**","/web/img/**","/web/js/**").permitAll()//
+               .antMatchers("/web/index.html","/web/css/**","/web/img/**","/web/js/**","/api/loans").permitAll()//
                .antMatchers(HttpMethod.POST, "/api/login","/api/logout","/api/clients").permitAll()
-                .antMatchers(HttpMethod.POST,"/api/clients/current/accounts","/api/clients/current/cards","api/transactions").hasAnyAuthority("CLIENT","ADMIN")
+                .antMatchers(HttpMethod.POST,"/api/clients/current/accounts","/api/clients/current/cards"
+                        ,"/api/transactions","/api/loans").hasAnyAuthority("CLIENT","ADMIN")
                .antMatchers("/web/**.html").hasAnyAuthority("CLIENT","ADMIN")
+
                 .antMatchers("/api/**").hasAnyAuthority("CLIENT","ADMIN")
                //.antMatchers("/api/clients","/api/accounts","/api/cards","api/transactions"
                 //       ,"api/clients/{id}","/api/accounts/{id}","/api/transaction/{id}",

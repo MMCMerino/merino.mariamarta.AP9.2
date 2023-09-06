@@ -3,6 +3,7 @@ package com.mindhub.homebanking.controllers;
 import com.mindhub.homebanking.dtos.ClientDTO;
 import com.mindhub.homebanking.models.Client;
 import com.mindhub.homebanking.repositories.ClientRepository;
+import com.mindhub.homebanking.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,28 +19,27 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class ClientController {
 
+
+
     @Autowired
-    private ClientRepository clientRepository;
+    private ClientService clientService;
 
     @GetMapping("/clients")
     public List<ClientDTO> getClients() {
 
-        return clientRepository.findAll()
-                .stream()
-                .map( currentClient -> new ClientDTO(currentClient) )
-                .collect(Collectors.toList());
+        return clientService.getClientDTO();
     }
 
     @GetMapping("/clients/{id}")
     public ClientDTO getClientById(@PathVariable Long id){
 
-      return new ClientDTO(clientRepository.findById(id).orElse(null));
+      return clientService.getClientDTO(id);
 
     }
 
     @GetMapping("/clients/current")
     public ClientDTO getAuthenticatedClient(Authentication authentication) {
-            return new ClientDTO(clientRepository.findByEmail(authentication.getName()));
+            return clientService.getAuthenticatedClient(authentication.getName());
 
     }
 
@@ -67,7 +67,7 @@ public class ClientController {
 
 
 
-        if (clientRepository.findByEmail(email) !=  null) {
+        if (clientService.findByEmail(email) !=  null) {
 
             return new ResponseEntity<>("Name already in use", HttpStatus.FORBIDDEN);
 
@@ -75,8 +75,7 @@ public class ClientController {
 
 
 
-        clientRepository.save(new Client(firstName, lastName, email, passwordEncoder.encode(password)));
-
+        clientService.save(new Client(firstName, lastName, email, passwordEncoder.encode(password)));
         return new ResponseEntity<>(HttpStatus.CREATED);
 
     }

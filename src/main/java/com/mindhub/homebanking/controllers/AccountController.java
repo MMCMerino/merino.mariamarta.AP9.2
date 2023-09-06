@@ -7,6 +7,8 @@ import com.mindhub.homebanking.models.Account;
 import com.mindhub.homebanking.models.Client;
 import com.mindhub.homebanking.repositories.AccountRepository;
 import com.mindhub.homebanking.repositories.ClientRepository;
+import com.mindhub.homebanking.services.AccountService;
+import com.mindhub.homebanking.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,35 +24,27 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class AccountController {
 
-    @Autowired
-    private AccountRepository accountRepository;
+
+
 
     @Autowired
-    private ClientRepository clientRepository;
-
+    private AccountService accountService;
+    @Autowired
+    private ClientService clientService;
 
     @GetMapping("/accounts")
     public List<AccountDTO> getAccounts(){
 
-        return  accountRepository.findAll()
-                .stream()
-                .map(currentAccount -> new AccountDTO(currentAccount))
-                .collect(Collectors.toList());
+        return  accountService.getAccounts();
 
     }
 
-/*
-    @GetMapping("/accounts/{id}")
-    public AccountDTO getAccountById(@PathVariable Long id){   //public ResponseEntity<Object>
 
-        return new AccountDTO(accountRepository.findById(id).get());
-
-    }*/
 
    @GetMapping("/accounts/{id}")
     public ResponseEntity<Object> getAccountById(@PathVariable Long id, Authentication authentication) {
-        Account account = accountRepository.findById(id).get();
-        Client client = clientRepository.findByEmail(authentication.getName());
+        Account account = accountService.findById(id);
+        Client client = clientService.findByEmail(authentication.getName());
 
         if(client == null){
             return new ResponseEntity<>("Client not found", HttpStatus.BAD_GATEWAY);
@@ -70,7 +64,7 @@ public class AccountController {
 
     @GetMapping("/clients/current/accounts")
     public List<AccountDTO>  getAccounts1(Authentication authentication){
-       Client client = this.clientRepository.findByEmail(authentication.getName());
+       Client client = this.clientService.findByEmail(authentication.getName());
        return client.getAccounts().stream().map(AccountDTO::new).collect(Collectors.toList());
     }
 
@@ -81,7 +75,7 @@ public class AccountController {
     public ResponseEntity<Object> newAccount(Authentication authentication){
 
         //debo hacer que el cliente logeado se le genere la cuenta
-       Client client = this.clientRepository.findByEmail(authentication.getName());
+       Client client = this.clientService.findByEmail(authentication.getName());
        long accountNumber = Math.round(Math.random()*100000000);//genero un numero aleatorio de 8 digitos
         do {
             //cantidad de cuentas es el numero de elementos de la tabla de la base de datos accounts
@@ -89,12 +83,12 @@ public class AccountController {
 
                 Account accountNew = new Account("VIN" + accountNumber, 0, LocalDate.now());
                 client.addAccount(accountNew);
-                accountRepository.save(accountNew);
+                accountService.save(accountNew);
                 return new ResponseEntity<>(HttpStatus.CREATED);
             } else {
                 return new ResponseEntity<>("You already have the maximum number of accounts", HttpStatus.FORBIDDEN);
             }
-        }while(clientRepository.existByAccountNumber(accountNumber));//crea la cuenta mientras no exista ese numero de cuenta
+        }while(clientService.existsByAccountNumber(accountNumber));//crea la cuenta mientras no exista ese numero de cuenta
     }
 
 }

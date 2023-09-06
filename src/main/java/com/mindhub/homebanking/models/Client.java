@@ -14,14 +14,14 @@ public class Client {
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
     private Long id;
-    public String firstName;
-    public String lastName;
+    private String firstName;
+    private String lastName;
 
-    public String email;
+    private String email;
 
     private String password;
 
-    public String loans;
+    private String loans;
 
     @OneToMany(mappedBy="client", fetch=FetchType.EAGER)
     private Set <Account> accounts = new HashSet<>();

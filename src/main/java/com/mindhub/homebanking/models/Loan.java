@@ -16,14 +16,19 @@ public class Loan {
     @GenericGenerator(name = "native", strategy = "native")
 
     private Long id;
-    public String name;
-    public double maxAmount;
+    private String name;
+    private double maxAmount;
+
 
     @ElementCollection
-    public List<Integer> payments;
+    private List<Integer> payments;
 
     @OneToMany(mappedBy = "loan", fetch = FetchType.EAGER)
     private Set<ClientLoan> clientLoans = new HashSet<>();
+
+    @OneToMany(mappedBy = "loan", fetch = FetchType.EAGER)
+    private Set<LoanApplication> loanApplications = new HashSet<>();
+
 
 
     //Constructores
@@ -61,7 +66,11 @@ public class Loan {
         return clientLoans;
     }
 
-    //Setters
+    public Set<LoanApplication> getLoanApplications() {
+        return loanApplications;
+    }
+
+//Setters
 
     public void setName(String name) {
         this.name = name;
@@ -79,5 +88,12 @@ public class Loan {
         clientLoan.setLoan(this);
         clientLoans.add(clientLoan);
     }
+    public void addLoanApplication(LoanApplication loanApplication) {
+        loanApplication.setLoan(this);
+        loanApplications.add(loanApplication);
+    }
+
+
+
 
 }
