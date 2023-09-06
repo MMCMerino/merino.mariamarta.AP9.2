@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@Transactional
+
 @RequestMapping("/api")
 public class TransactionController {
     @Autowired
@@ -55,7 +55,7 @@ public class TransactionController {
         }
 
     }
-
+    @Transactional
     @RequestMapping(path = "/transactions", method = RequestMethod.POST)
 
     public ResponseEntity<Object> newTransaction(@RequestParam String fromAccountNumber,
