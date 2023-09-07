@@ -75,12 +75,9 @@ public class LoanController {
 
 
 
-        System.out.println(loanApplicationDTO.getToAccountNumber());
-      //  System.out.println(client.getLoans().equals(loanApplicationDTO.getLoanId()));
-        System.out.println(client.getLoans());
-        System.out.println(loan.getName());
-        System.out.println(loanApplicationDTO.getLoanId());
-       if(loanApplicationDTO.getPayments() == 0 ||loanApplicationDTO.getToAccountNumber().isBlank() ||loanApplicationDTO.getAmount()<=0){
+
+
+       if(loanApplicationDTO.getPayments() == 0 ||loanApplicationDTO.getToAccountNumber().isBlank() ||loanApplicationDTO.getAmount()<=10000){
             return new ResponseEntity<>("Invalid parameters",HttpStatus.FORBIDDEN);
 
         } else if(loan.equals(loanApplicationDTO.getLoanId())){
@@ -93,7 +90,9 @@ public class LoanController {
 
         }else if (!(client.getAccounts().contains(toAccount))) {
            return new ResponseEntity<>("Account error", HttpStatus.FORBIDDEN);
-       }/*else if(client.getLoans().contains(loanApplicationDTO.)){//todo-> verificar que el prestamo no este tomado
+       }/*else if(!client.getClientLoans().stream().
+               filter(clientLoans ->clientLoans.getLoan().equals(loanApplicationDTO.getLoanId()))
+               .collect(Collectors.toSet()).isEmpty()){//todo-> verificar que el prestamo no este tomado
            return new ResponseEntity<>("You already acquired that loan",HttpStatus.FORBIDDEN);
         }*/else{
             //Creo el nuevo prestamo
