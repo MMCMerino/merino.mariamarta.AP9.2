@@ -7,6 +7,7 @@ import com.mindhub.homebanking.repositories.CardRepository;
 import com.mindhub.homebanking.repositories.ClientRepository;
 import com.mindhub.homebanking.services.CardService;
 import com.mindhub.homebanking.services.ClientService;
+import com.mindhub.homebanking.utils.cardUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +61,7 @@ public class CardController {
                 .collect(Collectors.toSet());
     }
 
-    @RequestMapping(path = "/clients/current/cards", method = RequestMethod.POST)
+    @PostMapping("/clients/current/cards")
 
     public ResponseEntity<Object> newCard(@RequestParam CardType cardType,
                                           @RequestParam CardColor cardColor,
@@ -81,8 +82,8 @@ public class CardController {
 
             Card cardNew = new Card(client.getFirstName() + " " + client.getLastName()
                                         , cardType, cardColor
-                                         , getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999) + "-" + getRandomNumber(0, 9999)
-                , getRandomNumber(0, 999), LocalDate.now(), LocalDate.now().plusYears(5));
+                                         , cardUtils.getRandomNumber(0, 9999) + "-" + cardUtils.getRandomNumber(0, 9999) + "-" + cardUtils.getRandomNumber(0, 9999) + "-" + cardUtils.getRandomNumber(0, 9999)
+                , cardUtils.getRandomNumber(0, 999), LocalDate.now(), LocalDate.now().plusYears(5));
             client.addCard(cardNew);
             cardService.save(cardNew);
 
@@ -95,11 +96,8 @@ public class CardController {
         }
 
 
-    public int getRandomNumber(int min, int max){
-        return (int)((Math.random()*(max-min))+min);
 
 }
 
 
 
-}

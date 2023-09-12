@@ -70,7 +70,7 @@ public class AccountController {
 
 
 
-    @RequestMapping(path = "/clients/current/accounts", method = RequestMethod.POST)
+    @PostMapping("/clients/current/accounts")
 
     public ResponseEntity<Object> newAccount(Authentication authentication){
 

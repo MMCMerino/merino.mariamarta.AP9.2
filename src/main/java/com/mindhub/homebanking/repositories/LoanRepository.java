@@ -8,8 +8,14 @@ import java.util.Optional;
 
 @RepositoryRestResource
 public interface LoanRepository extends JpaRepository<Loan, Long> {
-    Loan findByName(String name);
-    Optional<Loan> findById(Long id);
+    Loan  findByName(String name);
+    Optional<Loan>  findById(Long id);
+
+
+    //Task11 ????
+   /* boolean existsLoans(String name);
+
+    boolean existsPersonalLoan(String name);*/
 
 
 }
